@@ -31,7 +31,7 @@ def define(word: str, dictionary="gcide") -> str:
     required=True,
     type=click.Path(writable=True),
 )
-def run(vocab: Path, dictionary: str, ouput_file: Path):
+def run(vocab: str, dictionary: str, ouput_file: str):
     out = []
     conn = sqlite3.connect(vocab)
     query = "select word, stem from words where length(word)>4"  # don't care about accidentals
@@ -41,8 +41,8 @@ def run(vocab: Path, dictionary: str, ouput_file: Path):
         definition = define(word := row[0])
         if not definition:
             print(f"Couldn't find a definition for {word}")
-        out.append((word, row[1]))
-    with Path(ouput_file).open() as f:
+        out.append((f"{word} ({row[1]})", definition))
+    with open(ouput_file, 'w') as f:
         writer = csv.writer(f)
         writer.writerows(out)
 
